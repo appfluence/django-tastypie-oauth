@@ -49,8 +49,10 @@ class OAuth20Authentication(Authentication):
                 for header in ['Authorization', 'HTTP_AUTHORIZATION']:
                     auth_header_value = request.META.get(header)
                     if auth_header_value:
-                        key = auth_header_value.split(' ', 1)[1]
-                        break
+                        tokens = auth_header_value.split(' ', 1)
+                        if len(tokens) == 2:  # Avoid an IndexError in case of malformed header
+                            key = tokens[1]
+                            break
             if not key and request.method == 'POST':
                 if request.META.get('CONTENT_TYPE') == 'application/json':
                     decoded_body = request.body.decode('utf8')
